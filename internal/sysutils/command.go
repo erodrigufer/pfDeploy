@@ -1,4 +1,4 @@
-package shCmd
+package sysutils
 
 import (
 	"bytes"
@@ -6,15 +6,13 @@ import (
 	"os/exec"
 )
 
-// shCmd, run a shell command. args[0] is the command name, args[1:] are the
+// ShCmd, run a shell command. args[0] is the command name, args[1:] are the
 // command arguments.
-func (app *application) shCmd(args ...string) (string, error) {
+func ShCmd(args ...string) (string, error) {
 	// Command name.
 	baseCmd := args[0]
 	// Command arguments.
 	cmdArgs := args[1:]
-
-	app.debugLog.Printf("Command being executed: %s. Arguments: %s.\n", baseCmd, cmdArgs)
 
 	cmd := exec.Command(baseCmd, cmdArgs...)
 	// Buffers used to store the stdout and stderr output of command.

@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"os"
+
+	"github.com/erodrigufer/pfDeploy/internal/sysutils"
 )
 
 // setupApplication, it configures all needed general parameters for the
@@ -48,7 +50,7 @@ func (app *application) run() {
 	}
 
 	// Copy local pf rule set to /etc/pf.conf
-	if err := copyFile("./pf.conf", "/etc/pf.conf"); err != nil {
+	if err := sysutils.CopyFile("./pf.conf", "/etc/pf.conf"); err != nil {
 		err = fmt.Errorf("error while copying local pf rule set to /etc/pf.conf: %w", err)
 		app.errorLog.Fatalln(err)
 	}
@@ -56,7 +58,7 @@ func (app *application) run() {
 
 	app.infoLog.Println("Rebooting system to properly enable pf.")
 	// A reboot is necessary after configuring pf for the first time.
-	if err := app.reboot(); err != nil {
+	if err := sysutils.Reboot(); err != nil {
 		app.errorLog.Fatalln(err)
 	}
 }
@@ -65,42 +67,4 @@ func (app *application) run() {
 func (app *application) parseFlags() {
 	flag.BoolVar(&app.configurations.debugMode, "debugMode", false, "Debug mode activates the debug logger.")
 	flag.Parse()
-}
-
-// TODO: move reboot and copyFile to internal
-
-// reboot, reboots the system. Required after activating pf for the first time.
-func (app *application) reboot() error {
-	_, err := app.shCmd("reboot")
-	if err != nil {
-		err = fmt.Errorf("reboot attempt failed: %w", err)
-		return err
-	}
-	// The program should never come this far, since it would reboot before.
-	return nil
-}
-
-// copyFile the src file to dst. Any existing file will be overwritten and will not
-// copy file attributes.
-func copyFile(src, dst string) error {
-	in, err := os.Open(src)
-	if err != nil {
-		return fmt.Errorf("error while trying to open file ('%s'): %w", src, err)
-	}
-	defer in.Close()
-
-	// The 'dst' file will be created, or truncated if it already exists
-	// (overwritten). 'dst' file has file mode 0666.
-	out, err := os.Create(dst)
-	if err != nil {
-		return fmt.Errorf("error while trying to create file ('%s'): %w", dst, err)
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, in)
-	if err != nil {
-		return fmt.Errorf("error while trying to copy data from file '%s' to file '%s': %w", src, dst, err)
-	}
-
-	return nil
 }

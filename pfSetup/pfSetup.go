@@ -2,6 +2,8 @@ package pfSetup
 
 import (
 	"fmt"
+
+	"github.com/erodrigufer/pfDeploy/internal/sysutils"
 )
 
 // TODO: remove dependencies with application from methods
@@ -181,16 +183,16 @@ func (app *application) rcConfiguration() error {
 
 // enablePF, enables PF. The firewall starts filtering packets, it is just as
 // running 'pfctl -e'.
-func (app *application) enablePF() (string, error) {
+func enablePF() (string, error) {
 	// Check first if pfctl is already running, because, otherwise if it is
 	// already running 'pfctl -e' returns an error.
-	_, err := app.shCmd("pfctl", "-s Running")
+	_, err := sysutils.ShCmd("pfctl", "-s Running")
 	// 'pfctl -s Running' returns no error if pfctl is already running.
 	if err == nil {
 		return "pfctl is already running.", nil
 	}
 
-	outStr, err := app.shCmd("pfctl", "-e")
+	outStr, err := sysutils.ShCmd("pfctl", "-e")
 	if err != nil {
 		return "", fmt.Errorf("error enabling pf: %w", err)
 	}

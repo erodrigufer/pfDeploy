@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+// TODO: remove dependencies with application from methods
+
 // rcEnablePF, enable pf in /etc/rc.conf. So that it starts at boot.
 func (app *application) rcEnablePF() (string, error) {
 	// Check if pf has already been enabled, in that case, just return without

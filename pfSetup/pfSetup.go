@@ -13,7 +13,7 @@ func (app *application) rcEnablePF() (string, error) {
 	// Check if pf has already been enabled, in that case, just return without
 	// altering the /etc/rc.conf file again.
 	// -n returns only the value of a variable in the rc.conf file.
-	cmdOut, err := app.shCmd("sysrc", "-n", "pf_enable")
+	cmdOut, err := sysutils.ShCmd("sysrc", "-n", "pf_enable")
 	if err != nil {
 		// An error can be returned, when the variable does not exist yet in
 		// the rc.conf file. So, do not inmediately return from the method,
@@ -35,7 +35,7 @@ func (app *application) rcEnablePF() (string, error) {
 		}
 	}
 	// If pf_enable has not been set to 'YES' yet, enable it.
-	cmdOut, err = app.shCmd("sysrc", "pf_enable=YES")
+	cmdOut, err = sysutils.ShCmd("sysrc", "pf_enable=YES")
 	if err != nil {
 		return "", fmt.Errorf("unable to enable pf in /etc/rc.conf: %w", err)
 	}
@@ -48,7 +48,7 @@ func (app *application) rcEnablePF() (string, error) {
 
 // setupRulesFile, establishes '/etc/pf.conf' as the rules file for pf.
 func (app *application) setupRulesFile() (string, error) {
-	cmdOut, err := app.shCmd("sysrc", "pf_rules=/etc/pf.conf")
+	cmdOut, err := sysutils.ShCmd("sysrc", "pf_rules=/etc/pf.conf")
 	if err != nil {
 		return "", fmt.Errorf("unable to setup /etc/pf.conf as the rules file for pf: %w", err)
 	}
@@ -61,7 +61,7 @@ func (app *application) setupRulesFile() (string, error) {
 
 // setupLogFile, establishes '/var/log/pflog' as the log file for pf.
 func (app *application) setupLogFile() (string, error) {
-	cmdOut, err := app.shCmd("sysrc", "pflog_logfile=/var/log/pflog")
+	cmdOut, err := sysutils.ShCmd("sysrc", "pflog_logfile=/var/log/pflog")
 	if err != nil {
 		return "", fmt.Errorf("unable to setup /var/log/pflog as the log file for pflog: %w", err)
 	}
@@ -77,7 +77,7 @@ func (app *application) enablePflog() (string, error) {
 	// Check if pflog has already been enabled, in that case, just return without
 	// altering the /etc/rc.conf file again.
 	// -n returns only the value of a variable in the rc.conf file.
-	cmdOut, err := app.shCmd("sysrc", "-n", "pflog_enable")
+	cmdOut, err := sysutils.ShCmd("sysrc", "-n", "pflog_enable")
 	if err != nil {
 		// An error can be returned, when the variable does not exist yet in
 		// the rc.conf file. So, do not inmediately return from the method,
@@ -99,7 +99,7 @@ func (app *application) enablePflog() (string, error) {
 		}
 	}
 	// If pflog_enable has not been set to 'YES' yet, enable it.
-	cmdOut, err = app.shCmd("sysrc", "pflog_enable=YES")
+	cmdOut, err = sysutils.ShCmd("sysrc", "pflog_enable=YES")
 	if err != nil {
 		return "", fmt.Errorf("unable to enable pflog in /etc/rc.conf: %w", err)
 	}
@@ -110,10 +110,11 @@ func (app *application) enablePflog() (string, error) {
 
 }
 
-// checkRuleSet, runs `pfctl -n` to check the pf rules of a given file.
-func (app *application) checkRuleSet(file string) (string, error) {
+// CheckRuleSet, runs `pfctl -n` to check the syntax validity of the pf rules
+// of a given file.
+func CheckRuleSet(file string) (string, error) {
 	// -n checks rules of -f file.
-	cmdOut, err := app.shCmd("pfctl", "-nf", file)
+	cmdOut, err := sysutils.ShCmd("pfctl", "-nf", file)
 	if err != nil {
 		return "", fmt.Errorf("error checking the rules of pf file: %w", err)
 	}
@@ -127,7 +128,7 @@ func (app *application) checkRuleSet(file string) (string, error) {
 // activateRules, activates the rules in a file as the new pf rule set.
 func (app *application) activateRules(file string) (string, error) {
 	// Activate given file as new rule set.
-	cmdOut, err := app.shCmd("pfctl", "-f", file)
+	cmdOut, err := sysutils.ShCmd("pfctl", "-f", file)
 	if err != nil {
 		return "", fmt.Errorf("error activating new pf rule set from file (%s): %w", file, err)
 	}
@@ -181,9 +182,9 @@ func (app *application) rcConfiguration() error {
 	return nil
 }
 
-// enablePF, enables PF. The firewall starts filtering packets, it is just as
+// EnablePF, enables PF. The firewall starts filtering packets, it is just as
 // running 'pfctl -e'.
-func enablePF() (string, error) {
+func EnablePF() (string, error) {
 	// Check first if pfctl is already running, because, otherwise if it is
 	// already running 'pfctl -e' returns an error.
 	_, err := sysutils.ShCmd("pfctl", "-s Running")

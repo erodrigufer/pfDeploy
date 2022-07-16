@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/erodrigufer/pfDeploy/internal/sysutils"
+	"github.com/erodrigufer/pfDeploy/pfSetup"
 )
 
 // setupApplication, it configures all needed general parameters for the
@@ -36,7 +37,7 @@ func (app *application) setupApplication() {
 func (app *application) run() {
 	// Check the pf rules before enabling pf, if the rules have a problem return
 	// before configuring the system any further.
-	outStr, err := app.checkRuleSet("./pf.conf")
+	outStr, err := pfSetup.CheckRuleSet("./pf.conf")
 	if err != nil {
 		app.errorLog.Fatalln(err)
 	}

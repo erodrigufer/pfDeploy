@@ -46,7 +46,7 @@ func (app *application) run() {
 		app.infoLog.Println(outStr)
 	}
 
-	if err := app.rcConfiguration(); err != nil {
+	if err := pfSetup.RCConfiguration(); err != nil {
 		app.errorLog.Fatalln(err)
 	}
 

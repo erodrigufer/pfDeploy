@@ -6,10 +6,8 @@ import (
 	"github.com/erodrigufer/pfDeploy/internal/sysutils"
 )
 
-// TODO: remove dependencies with application from methods
-
 // rcEnablePF, enable pf in /etc/rc.conf. So that it starts at boot.
-func (app *application) rcEnablePF() (string, error) {
+func rcEnablePF() (string, error) {
 	// Check if pf has already been enabled, in that case, just return without
 	// altering the /etc/rc.conf file again.
 	// -n returns only the value of a variable in the rc.conf file.
@@ -47,7 +45,7 @@ func (app *application) rcEnablePF() (string, error) {
 }
 
 // setupRulesFile, establishes '/etc/pf.conf' as the rules file for pf.
-func (app *application) setupRulesFile() (string, error) {
+func setupRulesFile() (string, error) {
 	cmdOut, err := sysutils.ShCmd("sysrc", "pf_rules=/etc/pf.conf")
 	if err != nil {
 		return "", fmt.Errorf("unable to setup /etc/pf.conf as the rules file for pf: %w", err)
@@ -60,7 +58,7 @@ func (app *application) setupRulesFile() (string, error) {
 }
 
 // setupLogFile, establishes '/var/log/pflog' as the log file for pf.
-func (app *application) setupLogFile() (string, error) {
+func setupLogFile() (string, error) {
 	cmdOut, err := sysutils.ShCmd("sysrc", "pflog_logfile=/var/log/pflog")
 	if err != nil {
 		return "", fmt.Errorf("unable to setup /var/log/pflog as the log file for pflog: %w", err)
@@ -73,7 +71,7 @@ func (app *application) setupLogFile() (string, error) {
 }
 
 // enablePflog, enable pflog in /etc/rc.conf. So that it starts at boot.
-func (app *application) enablePflog() (string, error) {
+func enablePflog() (string, error) {
 	// Check if pflog has already been enabled, in that case, just return without
 	// altering the /etc/rc.conf file again.
 	// -n returns only the value of a variable in the rc.conf file.
@@ -126,7 +124,7 @@ func CheckRuleSet(file string) (string, error) {
 }
 
 // activateRules, activates the rules in a file as the new pf rule set.
-func (app *application) activateRules(file string) (string, error) {
+func activateRules(file string) (string, error) {
 	// Activate given file as new rule set.
 	cmdOut, err := sysutils.ShCmd("pfctl", "-f", file)
 	if err != nil {
@@ -139,9 +137,9 @@ func (app *application) activateRules(file string) (string, error) {
 
 }
 
-// rcConfiguration, does all the required configurations on /etc/rc.conf to have pf
+// RCConfiguration, does all the required configurations on /etc/rc.conf to have pf
 // working after rebooting the system.
-func (app *application) rcConfiguration() error {
+func RCConfiguration() error {
 	// Enable pf in rc.conf. After enabling pf, the default pf stance is to
 	// accept all connections, so one will not be locked out of the SSH
 	// connection with the server.

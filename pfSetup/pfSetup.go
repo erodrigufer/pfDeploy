@@ -6,19 +6,15 @@ import (
 	"github.com/erodrigufer/pfDeploy/internal/sysutils"
 )
 
-// rcEnablePF, enable pf in /etc/rc.conf. So that it starts at boot.
-func rcEnablePF() (string, error) {
+// RCEnablePF, enable pf in /etc/rc.conf. So that it starts at boot.
+func RCEnablePF() (string, error) {
 	// Check if pf has already been enabled, in that case, just return without
 	// altering the /etc/rc.conf file again.
 	// -n returns only the value of a variable in the rc.conf file.
 	cmdOut, err := sysutils.ShCmd("sysrc", "-n", "pf_enable")
-	if err != nil {
-		// An error can be returned, when the variable does not exist yet in
-		// the rc.conf file. So, do not inmediately return from the method,
-		// try to still enable the variable.
-		err = fmt.Errorf("error while checking value of pf_enable in rc.conf: %w", err)
-		app.errorLog.Println(err)
-	}
+	// An error can be returned, when the variable does not exist yet in
+	// the rc.conf file. So, do not inmediately return from the method,
+	// try to still enable the variable.
 	// If no error is returned, check if the value is already 'YES', in that
 	// case, return without further altering the rc.conf file.
 	if err == nil {
@@ -28,8 +24,7 @@ func rcEnablePF() (string, error) {
 		fmt.Sscan(cmdOut, &pfRCValue)
 
 		if pfRCValue == "YES" {
-			app.infoLog.Println("pf is already enabled in /etc/rc.conf")
-			return "", nil
+			return "pf is already enabled in /etc/rc.conf", nil
 		}
 	}
 	// If pf_enable has not been set to 'YES' yet, enable it.
@@ -38,7 +33,7 @@ func rcEnablePF() (string, error) {
 		return "", fmt.Errorf("unable to enable pf in /etc/rc.conf: %w", err)
 	}
 
-	app.infoLog.Println("pf was successfully enabled in /etc/rc.conf")
+	cmdOut = fmt.Sprintf("pf was successfully enabled in /etc/rc.conf: %s", cmdOut)
 
 	return cmdOut, nil
 
@@ -51,7 +46,7 @@ func setupRulesFile() (string, error) {
 		return "", fmt.Errorf("unable to setup /etc/pf.conf as the rules file for pf: %w", err)
 	}
 
-	app.infoLog.Println("pf_rules were successfully setup to be in /etc/pf.conf")
+	cmdOut = fmt.Sprintf("pf_rules were successfully setup to be in /etc/pf.conf: %s", cmdOut)
 
 	return cmdOut, nil
 
@@ -64,25 +59,20 @@ func setupLogFile() (string, error) {
 		return "", fmt.Errorf("unable to setup /var/log/pflog as the log file for pflog: %w", err)
 	}
 
-	app.infoLog.Println("pflog file was successfully setup to be in /var/log/pflog")
-
+	cmdOut = fmt.Sprintf("pflog file was successfully setup to be in /var/log/pflog: %s", cmdOut)
 	return cmdOut, nil
 
 }
 
-// enablePflog, enable pflog in /etc/rc.conf. So that it starts at boot.
-func enablePflog() (string, error) {
+// RCEnablePflog, enable pflog in /etc/rc.conf. So that it starts at boot.
+func RCEnablePflog() (string, error) {
 	// Check if pflog has already been enabled, in that case, just return without
 	// altering the /etc/rc.conf file again.
 	// -n returns only the value of a variable in the rc.conf file.
 	cmdOut, err := sysutils.ShCmd("sysrc", "-n", "pflog_enable")
-	if err != nil {
-		// An error can be returned, when the variable does not exist yet in
-		// the rc.conf file. So, do not inmediately return from the method,
-		// try to still enable the variable.
-		err = fmt.Errorf("error while checking value of pflog_enable in rc.conf: %w", err)
-		app.errorLog.Println(err)
-	}
+	// An error can be returned, when the variable does not exist yet in
+	// the rc.conf file. So, do not inmediately return from the method,
+	// try to still enable the variable.
 	// If no error is returned, check if the value is already 'YES', in that
 	// case, return without further altering the rc.conf file.
 	if err == nil {
@@ -93,7 +83,7 @@ func enablePflog() (string, error) {
 
 		if pflogRCValue == "YES" {
 			app.infoLog.Println("pflog is already enabled in /etc/rc.conf")
-			return "", nil
+			return "pflog is already enabled in /etc/rc.conf", nil
 		}
 	}
 	// If pflog_enable has not been set to 'YES' yet, enable it.
@@ -102,8 +92,7 @@ func enablePflog() (string, error) {
 		return "", fmt.Errorf("unable to enable pflog in /etc/rc.conf: %w", err)
 	}
 
-	app.infoLog.Println("pflog was successfully enabled in /etc/rc.conf")
-
+	cmdOut = fmt.Sprintf("pflog was successfully enabled in /etc/rc.conf: %s", cmdOut)
 	return cmdOut, nil
 
 }
@@ -143,7 +132,7 @@ func RCConfiguration() error {
 	// Enable pf in rc.conf. After enabling pf, the default pf stance is to
 	// accept all connections, so one will not be locked out of the SSH
 	// connection with the server.
-	outStr, err := app.rcEnablePF()
+	outStr, err := RCEnablePF()
 	if err != nil {
 		return err
 	}
@@ -152,7 +141,7 @@ func RCConfiguration() error {
 	}
 
 	// Let '/etc/pf.conf' be the rules file for pf.
-	outStr, err = app.setupRulesFile()
+	outStr, err = setupRulesFile()
 	if err != nil {
 		return err
 	}
@@ -160,7 +149,7 @@ func RCConfiguration() error {
 		app.infoLog.Println(outStr)
 	}
 
-	outStr, err = app.enablePflog()
+	outStr, err = RCEnablePflog()
 	if err != nil {
 		return err
 	}
@@ -169,7 +158,7 @@ func RCConfiguration() error {
 	}
 
 	// Let '/var/log/pflog' be the log file for pflog.
-	outStr, err = app.setupLogFile()
+	outStr, err = setupLogFile()
 	if err != nil {
 		return err
 	}

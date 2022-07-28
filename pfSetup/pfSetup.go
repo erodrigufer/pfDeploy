@@ -126,8 +126,8 @@ func activateRules(file string) (string, error) {
 
 }
 
-// RCConfiguration, does all the required configurations on /etc/rc.conf to have pf
-// working after rebooting the system.
+// RCConfiguration, does all the required configurations on /etc/rc.conf to
+// have pf working after rebooting the system.
 func RCConfiguration() error {
 	// Enable pf in rc.conf. After enabling pf, the default pf stance is to
 	// accept all connections, so one will not be locked out of the SSH

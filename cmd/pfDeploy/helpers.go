@@ -32,7 +32,7 @@ func (app *application) setupApplication() {
 	}
 }
 
-// run, runs the main application, by encapsulating the main applications
+// run, runs the main application, by encapsulating the main application's
 // methods, it makes the application more testable.
 func (app *application) run() {
 	// Check the pf rules before enabling pf, if the rules have a problem return
@@ -46,7 +46,7 @@ func (app *application) run() {
 		app.infoLog.Println(outStr)
 	}
 
-	if err := pfSetup.RCConfiguration(); err != nil {
+	if err := pfSetup.PFSetup(app.infoLog); err != nil {
 		app.errorLog.Fatalln(err)
 	}
 
@@ -56,6 +56,7 @@ func (app *application) run() {
 		app.errorLog.Fatalln(err)
 	}
 	app.infoLog.Println("Copied rule set to /etc/pf.conf.")
+	// TODO: Change file attributes of file just copied. Default 640.
 
 	app.infoLog.Println("Rebooting system to properly enable pf.")
 	// A reboot is necessary after configuring pf for the first time.

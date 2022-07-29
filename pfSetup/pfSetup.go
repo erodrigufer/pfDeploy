@@ -1,3 +1,5 @@
+// pfSetup, contains wrappers for the most common 'pfctl' commands and functions
+// to fully configure a pf setup.
 package pfSetup
 
 import (

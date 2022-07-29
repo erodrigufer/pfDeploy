@@ -50,14 +50,25 @@ func (app *application) run() {
 		app.errorLog.Fatalln(err)
 	}
 
+	// Destination for pf rule set.
+	des := "/etc/pf.conf"
 	// Copy local pf rule set to /etc/pf.conf
-	if err := sysutils.CopyFile("./pf.conf", "/etc/pf.conf"); err != nil {
-		err = fmt.Errorf("error while copying local pf rule set to /etc/pf.conf: %w", err)
+	if err := sysutils.CopyFile("./pf.conf", des); err != nil {
+		err = fmt.Errorf("error while copying local pf rule set to %s : %w", des, err)
 		app.errorLog.Fatalln(err)
 	}
 	app.infoLog.Println("Copied rule set to /etc/pf.conf.")
-	// TODO: Change file attributes of file just copied. Default 640.
 
+	// Change file mod and owners of new rule set file.
+	if err := os.Chmod(des, 0644); err != nil {
+		err = fmt.Errorf("error while changing file mod of %s : %w", des, err)
+		app.errorLog.Fatalln(err)
+	}
+	// uid=root(0); gid=wheel(0)
+	if err := os.Chown(des, 0, 0); err != nil {
+		err = fmt.Errorf("error while changing file owners of %s : %w", des, err)
+		app.errorLog.Fatalln(err)
+	}
 	app.infoLog.Println("Rebooting system to properly enable pf.")
 	// A reboot is necessary after configuring pf for the first time.
 	if err := sysutils.Reboot(); err != nil {

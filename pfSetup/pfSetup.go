@@ -141,7 +141,7 @@ func PFSetup(infoLog *log.Logger) error {
 		return err
 	}
 	if outStr != "" {
-		infoLog.Println(outStr)
+		infoLog.Print(outStr)
 	}
 
 	// Let '/etc/pf.conf' be the rules file for pf.
@@ -150,7 +150,7 @@ func PFSetup(infoLog *log.Logger) error {
 		return err
 	}
 	if outStr != "" {
-		infoLog.Println(outStr)
+		infoLog.Print(outStr)
 	}
 
 	outStr, err = RCEnablePflog()
@@ -158,7 +158,7 @@ func PFSetup(infoLog *log.Logger) error {
 		return err
 	}
 	if outStr != "" {
-		infoLog.Println(outStr)
+		infoLog.Print(outStr)
 	}
 
 	// Let '/var/log/pflog' be the log file for pflog.
@@ -167,7 +167,7 @@ func PFSetup(infoLog *log.Logger) error {
 		return err
 	}
 	if outStr != "" {
-		infoLog.Println(outStr)
+		infoLog.Print(outStr)
 	}
 
 	return nil

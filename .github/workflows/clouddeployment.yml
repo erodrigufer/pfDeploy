@@ -1,0 +1,65 @@
+name: Cloud Deployment
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  build:
+    name: Build Go scripts
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      # Use go.mod file to setup go version used.
+      with:
+        go-version-file: ./go.mod
+
+    - name: Check version
+      run: go version
+
+    - name: Build Go scripts
+      # -v prints the names of the packages as they are getting compiled.
+      run: go build -v ./...
+
+  # Read the documentation under cmd/vet for more in detail information 
+  # about the heuristics and checks used by the go vet tool to find problems in
+  # a codebase.
+  vet:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      # Use go.mod file to setup go version used.
+      with:
+        go-version-file: ./go.mod
+
+    - name: Check version
+      run: go version
+
+    - name: Vet all packages
+      run: go vet ./...
+
+# Test have not yet been created for this script.
+  # test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #   - uses: actions/checkout@v3
+
+  #   - name: Set up Go
+  #     uses: actions/setup-go@v3
+  #     # Use go.mod file to setup go version used.
+  #     with:
+  #       go-version-file: ./go.mod
+
+  #   - name: Check version
+  #     run: go version
+
+  #   - name: Run all tests
+  #     run: go test -v ./...

@@ -1,3 +1,5 @@
+// sysutils, handles primarily OS operations like rebooting the system,
+// file handling and running shell commands.
 package sysutils
 
 import (

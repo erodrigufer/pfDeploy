@@ -2,6 +2,7 @@ package pfSetup
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/erodrigufer/pfDeploy/internal/sysutils"
 )
@@ -82,7 +83,6 @@ func RCEnablePflog() (string, error) {
 		fmt.Sscan(cmdOut, &pflogRCValue)
 
 		if pflogRCValue == "YES" {
-			app.infoLog.Println("pflog is already enabled in /etc/rc.conf")
 			return "pflog is already enabled in /etc/rc.conf", nil
 		}
 	}
@@ -113,22 +113,24 @@ func CheckRuleSet(file string) (string, error) {
 }
 
 // activateRules, activates the rules in a file as the new pf rule set.
-func activateRules(file string) (string, error) {
-	// Activate given file as new rule set.
-	cmdOut, err := sysutils.ShCmd("pfctl", "-f", file)
-	if err != nil {
-		return "", fmt.Errorf("error activating new pf rule set from file (%s): %w", file, err)
-	}
-	// If the file does not exist, pfctl will throw an error, so it is unnecesa-
-	// ry to check for the existance of the file.
+// func activateRules(file string) (string, error) {
+// 	// Activate given file as new rule set.
+// 	cmdOut, err := sysutils.ShCmd("pfctl", "-f", file)
+// 	if err != nil {
+// 		return "", fmt.Errorf("error activating new pf rule set from file (%s): %w", file, err)
+// 	}
+// 	// If the file does not exist, pfctl will throw an error, so it is unnecesa-
+// 	// ry to check for the existance of the file.
 
-	return cmdOut, nil
+// 	return cmdOut, nil
 
-}
+// }
 
-// RCConfiguration, does all the required configurations on /etc/rc.conf to
+// PFSetup, does all the required configurations on /etc/rc.conf to
 // have pf working after rebooting the system.
-func RCConfiguration() error {
+// This function accepts a *log.Logger informational logger to print out
+// information after running commands.
+func PFSetup(infoLog *log.Logger) error {
 	// Enable pf in rc.conf. After enabling pf, the default pf stance is to
 	// accept all connections, so one will not be locked out of the SSH
 	// connection with the server.
@@ -137,7 +139,7 @@ func RCConfiguration() error {
 		return err
 	}
 	if outStr != "" {
-		app.infoLog.Println(outStr)
+		infoLog.Println(outStr)
 	}
 
 	// Let '/etc/pf.conf' be the rules file for pf.
@@ -146,7 +148,7 @@ func RCConfiguration() error {
 		return err
 	}
 	if outStr != "" {
-		app.infoLog.Println(outStr)
+		infoLog.Println(outStr)
 	}
 
 	outStr, err = RCEnablePflog()
@@ -154,7 +156,7 @@ func RCConfiguration() error {
 		return err
 	}
 	if outStr != "" {
-		app.infoLog.Println(outStr)
+		infoLog.Println(outStr)
 	}
 
 	// Let '/var/log/pflog' be the log file for pflog.
@@ -163,7 +165,7 @@ func RCConfiguration() error {
 		return err
 	}
 	if outStr != "" {
-		app.infoLog.Println(outStr)
+		infoLog.Println(outStr)
 	}
 
 	return nil

@@ -8,7 +8,7 @@ import (
 
 // Reboot, reboots the system.
 func Reboot() error {
-	_, err := app.shCmd("reboot")
+	_, err := ShCmd("reboot")
 	if err != nil {
 		err = fmt.Errorf("reboot attempt failed: %w", err)
 		return err

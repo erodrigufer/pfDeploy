@@ -17,8 +17,7 @@ func Reboot() error {
 	return nil
 }
 
-// TODO: change file attributes after copy or create a special function for that
-// copyFile, copy the src file to dst. Any existing file will be overwritten
+// CopyFile, copy the src file to dst. Any existing file will be overwritten
 // and will not copy file attributes.
 func CopyFile(src, dst string) error {
 	in, err := os.Open(src)

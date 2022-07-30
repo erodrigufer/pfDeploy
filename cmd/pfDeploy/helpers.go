@@ -39,40 +39,26 @@ func (app *application) run() {
 	// before configuring the system any further.
 	outStr, err := pfSetup.CheckRuleSet("./pf.conf")
 	if err != nil {
-		app.errorLog.Fatalln(err)
+		app.errorLog.Fatal(err)
 	}
-	app.infoLog.Println("pf config file successfully passed syntax test.")
+	app.infoLog.Print("pf config file successfully passed syntax test.")
 	if outStr != "" {
-		app.infoLog.Println(outStr)
+		app.infoLog.Print(outStr)
 	}
 
 	if err := pfSetup.PFSetup(app.infoLog); err != nil {
-		app.errorLog.Fatalln(err)
+		app.errorLog.Fatal(err)
 	}
 
-	// Destination for pf rule set.
-	des := "/etc/pf.conf"
-	// Copy local pf rule set to /etc/pf.conf
-	if err := sysutils.CopyFile("./pf.conf", des); err != nil {
-		err = fmt.Errorf("error while copying local pf rule set to %s : %w", des, err)
-		app.errorLog.Fatalln(err)
+	// Copy and configure file attributions of new pf rules file.
+	if err := app.initializeRulesFile(); err != nil {
+		app.errorLog.Fatal(err)
 	}
-	app.infoLog.Println("Copied rule set to /etc/pf.conf.")
 
-	// Change file mod and owners of new rule set file.
-	if err := os.Chmod(des, 0644); err != nil {
-		err = fmt.Errorf("error while changing file mod of %s : %w", des, err)
-		app.errorLog.Fatalln(err)
-	}
-	// uid=root(0); gid=wheel(0)
-	if err := os.Chown(des, 0, 0); err != nil {
-		err = fmt.Errorf("error while changing file owners of %s : %w", des, err)
-		app.errorLog.Fatalln(err)
-	}
-	app.infoLog.Println("Rebooting system to properly enable pf.")
+	app.infoLog.Print("Rebooting system to properly enable pf.")
 	// A reboot is necessary after configuring pf for the first time.
 	if err := sysutils.Reboot(); err != nil {
-		app.errorLog.Fatalln(err)
+		app.errorLog.Fatal(err)
 	}
 }
 
@@ -80,4 +66,32 @@ func (app *application) run() {
 func (app *application) parseFlags() {
 	flag.BoolVar(&app.configurations.debugMode, "debugMode", false, "Debug mode activates the debug logger.")
 	flag.Parse()
+}
+
+// initializeRulesFile, copies the given pf rules file to its standard path,
+// and sets the ownership and file attributes properly.
+func (app *application) initializeRulesFile() error {
+	// Destination for pf rule set.
+	des := "/etc/pf.conf"
+
+	// Copy local pf rule set to /etc/pf.conf, this does not change the
+	// ownership and file attributions of new file.
+	if err := sysutils.CopyFile("./pf.conf", des); err != nil {
+		err = fmt.Errorf("error while copying local pf rule set to %s : %w", des, err)
+		return err
+	}
+	app.infoLog.Printf("Succesfully copied new rule set to %s", des)
+
+	// Change file mod and owners of new rule set file.
+	if err := os.Chmod(des, 0644); err != nil {
+		err = fmt.Errorf("error while changing file mod of %s : %w", des, err)
+		return err
+	}
+	// File owned by root and in group wheel: uid=root(0); gid=wheel(0).
+	if err := os.Chown(des, 0, 0); err != nil {
+		err = fmt.Errorf("error while changing file owners of %s : %w", des, err)
+		return err
+	}
+
+	return nil
 }

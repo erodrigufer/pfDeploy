@@ -100,10 +100,10 @@ func RCEnablePflog() (string, error) {
 }
 
 // CheckRuleSet, runs `pfctl -n` to check the syntax validity of the pf rules
-// of a given file.
-func CheckRuleSet(file string) (string, error) {
+// of the file at the given filePath.
+func CheckRuleSet(filePath string) (string, error) {
 	// -n checks rules of -f file.
-	cmdOut, err := sysutils.ShCmd("pfctl", "-nf", file)
+	cmdOut, err := sysutils.ShCmd("pfctl", "-nf", filePath)
 	if err != nil {
 		return "", fmt.Errorf("error checking the rules of pf file: %w", err)
 	}
@@ -129,7 +129,8 @@ func CheckRuleSet(file string) (string, error) {
 // }
 
 // PFSetup, does all the required configurations on /etc/rc.conf to
-// have pf working after rebooting the system.
+// have pf working after rebooting the system. Furthermore, it also initializes
+// pflog at boot.
 // This function accepts a *log.Logger informational logger to print out
 // information after running commands.
 func PFSetup(infoLog *log.Logger) error {

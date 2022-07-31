@@ -1,20 +1,19 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 
 	"github.com/erodrigufer/pfDeploy/internal/sysutils"
 	"github.com/erodrigufer/pfDeploy/pfSetup"
+
+	"github.com/urfave/cli/v2"
 )
 
 // setupApplication, it configures all needed general parameters for the
 // application.
 func (app *application) setupApplication() {
-	app.parseFlags()
 
 	// Create a logger for INFO messages, the prefix "INFO" and a tab will be
 	// displayed before each log message. The flags Ldate and Ltime provide the
@@ -24,12 +23,40 @@ func (app *application) setupApplication() {
 	// Create an ERROR messages logger, addiotionally use the Lshortfile flag to
 	// display the file's name and line number for the error.
 	app.errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-	if app.configurations.debugMode {
-		app.debugLog = log.New(os.Stdout, "DEBUG\t", log.Ldate|log.Ltime|log.Lshortfile)
-	} else {
-		// Discard the output of the debug logger.
-		app.debugLog = log.New(io.Discard, "DEBUG\t", log.Ldate|log.Ltime|log.Lshortfile)
+	// if app.configurations.debugMode {
+	// 	app.debugLog = log.New(os.Stdout, "DEBUG\t", log.Ldate|log.Ltime|log.Lshortfile)
+	// } else {
+	// 	// Discard the output of the debug logger.
+	// 	app.debugLog = log.New(io.Discard, "DEBUG\t", log.Ldate|log.Ltime|log.Lshortfile)
+	// }
+}
+
+func (app *application) runTUI() {
+	app.setupCLI()
+
+	if err := app.tui.Run(os.Args); err != nil {
+		app.errorLog.Fatal(err)
 	}
+}
+
+func (app *application) setupCLI() {
+	app.tui = &cli.App{
+		Name:  "pfDeploy",
+		Usage: "Automatically setup pf in your new deployment.",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "file",
+				Aliases: []string{"f"},
+				Value:   "./pf.conf",
+				Usage:   "`PATH` to the file used as the new pf rule set.",
+			},
+		},
+		Action: func(cCtx *cli.Context) error {
+			app.run()
+			return nil
+		},
+	}
+
 }
 
 // run, runs the main application, by encapsulating the main application's
@@ -63,10 +90,10 @@ func (app *application) run() {
 }
 
 // parseFlags, parses any flags if they are present.
-func (app *application) parseFlags() {
-	flag.BoolVar(&app.configurations.debugMode, "debugMode", false, "Debug mode activates the debug logger.")
-	flag.Parse()
-}
+// func (app *application) parseFlags() {
+// 	flag.BoolVar(&app.configurations.debugMode, "debugMode", false, "Debug mode activates the debug logger.")
+// 	flag.Parse()
+// }
 
 // initializeRulesFile, copies the given pf rules file to its standard path,
 // and sets the ownership and file attributes properly.

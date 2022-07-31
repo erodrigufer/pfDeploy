@@ -1,6 +1,10 @@
 package main
 
-import "log"
+import (
+	"log"
+
+	"github.com/urfave/cli/v2"
+)
 
 // application, sets the types/objects which are needed application-wide.
 type application struct {
@@ -10,6 +14,8 @@ type application struct {
 	infoLog *log.Logger
 	// debugLog, debug log handler.
 	debugLog *log.Logger
+	// tui
+	tui *cli.App
 	// userConfigurations is the struct that stores all the user-defined
 	// configuration values.
 	configurations userConfigurations

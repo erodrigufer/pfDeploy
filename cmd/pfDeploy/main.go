@@ -6,5 +6,5 @@ func main() {
 	app := new(application)
 	app.setupApplication()
 
-	app.run()
+	app.runTUI()
 }

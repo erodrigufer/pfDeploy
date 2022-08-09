@@ -72,7 +72,7 @@ func (app *application) setupCLI() {
 			},
 			&cli.Command{
 				Name:  "check",
-				Usage: "Check the syntax validity of pf rules file.",
+				Usage: "Check the syntactical validity of a pf rules file.",
 				Flags: []cli.Flag{
 					&cli.StringFlag{
 						Name:     "file",

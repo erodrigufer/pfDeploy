@@ -1,0 +1,8 @@
+# .goreleaser.yaml
+builds:
+  - main: ./cmd/pfDeploy
+    id: "pfDeploy"
+    binary: pfDeploy
+    goos:
+      - freebsd
+

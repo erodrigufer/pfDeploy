@@ -2,7 +2,7 @@
 `pfDeploy` is a command-line tool capable of automatically configuring pf and pflog in a FreeBSD host machine. It is especially useful to quickly configure a newly spawned FreeBSD VM.
 
 ## Usage
-```bash
+```
 pfDeploy - Automatically setup pf in your new deployment.
 
 USAGE:

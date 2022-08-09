@@ -23,14 +23,9 @@ func (app *application) setupApplication() {
 	// Create an ERROR messages logger, addiotionally use the Lshortfile flag to
 	// display the file's name and line number for the error.
 	app.errorLog = log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
-	// if app.configurations.debugMode {
-	// 	app.debugLog = log.New(os.Stdout, "DEBUG\t", log.Ldate|log.Ltime|log.Lshortfile)
-	// } else {
-	// 	// Discard the output of the debug logger.
-	// 	app.debugLog = log.New(io.Discard, "DEBUG\t", log.Ldate|log.Ltime|log.Lshortfile)
-	// }
 }
 
+// runTUI, run the TUI (Terminal User Interface), handled by the CLI package.
 func (app *application) runTUI() {
 	app.setupCLI()
 
@@ -39,71 +34,105 @@ func (app *application) runTUI() {
 	}
 }
 
+// setupCLI, configure and initialize all commands, flags and options of
+// the TUI.
 func (app *application) setupCLI() {
 	app.tui = &cli.App{
 		Name:  "pfDeploy",
 		Usage: "Automatically setup pf in your new deployment.",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:    "file",
-				Aliases: []string{"f"},
-				Value:   "./pf.conf",
-				Usage:   "`PATH` to the file used as the new pf rule set.",
+		// This options enables short flag abbreviations to be merged into a
+		// single flag with a '-' prefix.
+		UseShortOptionHandling: true,
+		Commands: []*cli.Command{
+			&cli.Command{
+				Name:  "deploy",
+				Usage: "Setup pf and pflog at boot and deploy a new pf rules file.",
+				// Flags for deploy command.
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "file",
+						Aliases:  []string{"f"},
+						Required: true,
+						Usage:    "`PATH` to the file used as the new pf rule set.",
+					},
+					&cli.BoolFlag{
+						Name:    "reboot",
+						Aliases: []string{"r"},
+						Value:   true,
+						Usage:   "Reboot host after deploying new pf configuration.",
+					},
+				},
+				Action: func(cCtx *cli.Context) error {
+					if err := app.deploy(cCtx.String("file"), cCtx.Bool("reboot")); err != nil {
+						err = fmt.Errorf("error while executing 'deploy' command: %w", err)
+						return cli.Exit(err, 1)
+					}
+					return nil
+				},
 			},
-		},
-		Action: func(cCtx *cli.Context) error {
-			app.run()
-			return nil
+			&cli.Command{
+				Name:  "check",
+				Usage: "Check the syntax validity of pf rules file.",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "file",
+						Aliases:  []string{"f"},
+						Required: true,
+						Usage:    "`PATH` to the file used as the pf rule set.",
+					},
+				},
+				Action: func(cCtx *cli.Context) error {
+					// Read input for -file flag.
+					filePath := cCtx.String("file")
+					if err := app.checkRuleSet(filePath); err != nil {
+						err = fmt.Errorf("error while executing 'check' command: %w", err)
+						return cli.Exit(err, 1)
+					}
+					return nil
+				},
+			},
 		},
 	}
 
 }
 
-// run, runs the main application, by encapsulating the main application's
+// deploy, runs the main application, by encapsulating the main application's
 // methods, it makes the application more testable.
-func (app *application) run() {
+func (app *application) deploy(filePath string, rebootFlag bool) error {
 	// Check the pf rules before enabling pf, if the rules have a problem return
 	// before configuring the system any further.
-	outStr, err := pfSetup.CheckRuleSet("./pf.conf")
-	if err != nil {
-		app.errorLog.Fatal(err)
-	}
-	app.infoLog.Print("pf config file successfully passed syntax test.")
-	if outStr != "" {
-		app.infoLog.Print(outStr)
+	if err := app.checkRuleSet(filePath); err != nil {
+		return fmt.Errorf("error while checking validity of pf ruleset file %s: %w", filePath, err)
 	}
 
 	if err := pfSetup.PFSetup(app.infoLog); err != nil {
-		app.errorLog.Fatal(err)
+		return fmt.Errorf("error while configuring rc: %w", err)
 	}
 
 	// Copy and configure file attributions of new pf rules file.
-	if err := app.initializeRulesFile(); err != nil {
-		app.errorLog.Fatal(err)
+	if err := app.initializeRulesFile(filePath); err != nil {
+		return fmt.Errorf("error while copying and configuring the pf ruleset file: %w", err)
 	}
 
-	app.infoLog.Print("Rebooting system to properly enable pf.")
-	// A reboot is necessary after configuring pf for the first time.
-	if err := sysutils.Reboot(); err != nil {
-		app.errorLog.Fatal(err)
+	if rebootFlag {
+		app.infoLog.Print("Rebooting system to properly enable pf.")
+		// A reboot is necessary after configuring pf for the first time.
+		if err := sysutils.Reboot(); err != nil {
+			return fmt.Errorf("error while rebooting: %w", err)
+		}
 	}
+	return nil
 }
-
-// parseFlags, parses any flags if they are present.
-// func (app *application) parseFlags() {
-// 	flag.BoolVar(&app.configurations.debugMode, "debugMode", false, "Debug mode activates the debug logger.")
-// 	flag.Parse()
-// }
 
 // initializeRulesFile, copies the given pf rules file to its standard path,
 // and sets the ownership and file attributes properly.
-func (app *application) initializeRulesFile() error {
+func (app *application) initializeRulesFile(localFile string) error {
 	// Destination for pf rule set.
 	des := "/etc/pf.conf"
 
 	// Copy local pf rule set to /etc/pf.conf, this does not change the
 	// ownership and file attributions of new file.
-	if err := sysutils.CopyFile("./pf.conf", des); err != nil {
+	if err := sysutils.CopyFile(localFile, des); err != nil {
 		err = fmt.Errorf("error while copying local pf rule set to %s : %w", des, err)
 		return err
 	}
@@ -121,4 +150,18 @@ func (app *application) initializeRulesFile() error {
 	}
 
 	return nil
+}
+
+// checkRuleSet, check the syntax validity of a pf ruleset file.
+func (app *application) checkRuleSet(filePath string) error {
+	outStr, err := pfSetup.CheckRuleSet(filePath)
+	if err != nil {
+		return fmt.Errorf("error while checking syntax validity of ruleset file %s: %w", filePath, err)
+	}
+	app.infoLog.Print("pf config file successfully passed syntax test.")
+	if outStr != "" {
+		app.infoLog.Print(outStr)
+	}
+	return nil
+
 }

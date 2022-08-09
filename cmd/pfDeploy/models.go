@@ -12,16 +12,6 @@ type application struct {
 	errorLog *log.Logger
 	// infoLog, info log handler.
 	infoLog *log.Logger
-	// debugLog, debug log handler.
-	debugLog *log.Logger
 	// tui
 	tui *cli.App
-	// userConfigurations is the struct that stores all the user-defined
-	// configuration values.
-	configurations userConfigurations
-}
-
-type userConfigurations struct {
-	// debugMode, if true, run the debug logger for more explicit logging.
-	debugMode bool
 }

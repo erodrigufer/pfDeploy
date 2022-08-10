@@ -1,3 +1,6 @@
+# v0.1.2
+* First tests with automatic releasing using goreleaser.
+
 # v0.1.1
 * Add exemplary pf conf files (configuration for MongoDB).
 

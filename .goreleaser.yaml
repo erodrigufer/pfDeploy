@@ -3,6 +3,7 @@ builds:
   - main: ./cmd/pfDeploy
     id: "pfDeploy"
     binary: pfDeploy
+    # Build only for freebsd in amd64 architecture.
     goos:
       - freebsd
     goarch:

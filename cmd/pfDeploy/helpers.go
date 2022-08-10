@@ -11,7 +11,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-// setupApplication, it configures all needed general parameters for the
+// setupApplication, configures all needed general parameters for the
 // application.
 func (app *application) setupApplication() {
 

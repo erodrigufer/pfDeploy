@@ -1,3 +1,6 @@
+# v0.2.0
+* Fix bug, reboot flag is now called `--no-reboot`.
+
 # v0.1.2
 * First tests with automatic releasing using goreleaser.
 

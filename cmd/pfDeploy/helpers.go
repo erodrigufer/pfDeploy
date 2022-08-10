@@ -25,7 +25,7 @@ func (app *application) setupApplication() {
 
 // deploy, runs the main application, by encapsulating the main application's
 // methods, it makes the application more testable.
-func (app *application) deploy(filePath string, rebootFlag bool) error {
+func (app *application) deploy(filePath string, noRebootFlag bool) error {
 	// Check the pf rules before enabling pf, if the rules have a problem return
 	// before configuring the system any further.
 	if err := app.checkRuleSet(filePath); err != nil {
@@ -41,7 +41,7 @@ func (app *application) deploy(filePath string, rebootFlag bool) error {
 		return fmt.Errorf("error while copying and configuring the pf ruleset file: %w", err)
 	}
 
-	if rebootFlag {
+	if !noRebootFlag {
 		app.infoLog.Print("Rebooting system to properly enable pf.")
 		// A reboot is necessary after configuring pf for the first time.
 		if err := sysutils.Reboot(); err != nil {

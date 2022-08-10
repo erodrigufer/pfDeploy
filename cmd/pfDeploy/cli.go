@@ -38,14 +38,12 @@ func (app *application) setupCLI() {
 						Usage:    "`PATH` to the file used as the new pf rule set.",
 					},
 					&cli.BoolFlag{
-						Name:    "reboot",
-						Aliases: []string{"r"},
-						Value:   true,
-						Usage:   "Reboot host after deploying new pf configuration.",
+						Name:  "no-reboot",
+						Usage: "Do not reboot the host after deploying new pf configuration.",
 					},
 				},
 				Action: func(cCtx *cli.Context) error {
-					if err := app.deploy(cCtx.String("file"), cCtx.Bool("reboot")); err != nil {
+					if err := app.deploy(cCtx.String("file"), cCtx.Bool("no-reboot")); err != nil {
 						err = fmt.Errorf("error while executing 'deploy' command: %w", err)
 						return cli.Exit(err, 1)
 					}

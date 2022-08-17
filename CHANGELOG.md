@@ -1,3 +1,6 @@
+# v0.2.1
+* Add LICENSE
+
 # v0.2.0
 * Fix bug, reboot flag is now called `--no-reboot`.
 

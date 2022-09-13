@@ -1,3 +1,8 @@
+# v0.2.2
+* Add more information to main package description.
+* Add INSTALLATION guide to README.
+* Add Examples to README.
+
 # v0.2.1
 * Add LICENSE
 

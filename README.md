@@ -6,6 +6,7 @@
 <!-- vim-markdown-toc GFM -->
 
 * [Installation](#installation)
+	- [Dependencies](#dependencies)
 	- [With go install](#with-go-install)
 * [Usage](#usage)
 	- [Deploy](#deploy)
@@ -16,6 +17,9 @@
 
 ## Installation
 The following installation steps will install an executable of **pfDeploy** in the path used by Go to store binaries (as of _Go 1.18_, you can check the installation path for binaries by running `go env` and looking for the `GOPATH` variable. The binaries will be installed in the `/bin` subfolder of `GOPATH`. Add your `GOPATH` to your shell's `PATH` variable in order to execute Go binaries without having to specify the whole `GOPATH`).
+
+### Dependencies
+* Go 1.18+
 
 ### With go install
 1. Install the most recent version of the pfDeploy command-line utility to the `GOPATH` binaries subfolder with: `go install github.com/erodrigufer/pfDeploy/cmd/pfDeploy@latest`

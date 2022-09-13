@@ -22,7 +22,11 @@ The following installation steps will install an executable of **pfDeploy** in t
 * Go 1.18+
 
 ### With go install
-1. Install the most recent version of the pfDeploy command-line utility to the `GOPATH` binaries subfolder with: `go install github.com/erodrigufer/pfDeploy/cmd/pfDeploy@latest`
+1. Install the most recent version of the pfDeploy command-line utility to the `GOPATH` binaries subfolder with: 
+
+```
+go install github.com/erodrigufer/pfDeploy/cmd/pfDeploy@latest
+```
 
 ## Usage
 ```
@@ -50,7 +54,11 @@ pfDeploy deploy --file <FILE_RULESET> --no-reboot
 To show more help for the deploy command run `pfDeplot deploy --help`
 
 ### Check
-**Check the syntax validity** of a pf **ruleset** file without changing any system configuration with the command: `pfDeploy check --file <FILE_RULESET>` 
+Check the syntax validity of a pf ruleset file without changing any system configuration with the command: 
+
+```
+pfDeploy check --file <FILE_RULESET>
+```
 
 ## Exemplary configuration files
 In the subfolder `/configFiles` are exemplary ruleset files for pf.

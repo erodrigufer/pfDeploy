@@ -25,7 +25,7 @@ The following installation steps will install an executable of **pfDeploy** in t
 1. Install the most recent version of the pfDeploy command-line utility to the `GOPATH` binaries subfolder with: 
 
 ```
-go install github.com/erodrigufer/pfDeploy/cmd/pfDeploy@latest
+$ go install github.com/erodrigufer/pfDeploy/cmd/pfDeploy@latest
 ```
 
 ## Usage
@@ -48,7 +48,7 @@ GLOBAL OPTIONS:
 The command `deploy` checks the syntax validity of a given pf ruleset file, if the file is syntactically correct, the script changes the file at `/etc/rc.conf` so that both `pf` and `pflog` are always initialized at boot. Then, the given pf ruleset file is used as the new pf ruleset. Finally, the host is rebooted (unless the `--no-reboot` flag is used).
 
 ```
-pfDeploy deploy --file <FILE_RULESET> --no-reboot
+$ pfDeploy deploy --file <FILE_RULESET> --no-reboot
 ```
 
 To show more help for the deploy command run `pfDeplot deploy --help`
@@ -57,7 +57,7 @@ To show more help for the deploy command run `pfDeplot deploy --help`
 Check the syntax validity of a pf ruleset file without changing any system configuration with the command: 
 
 ```
-pfDeploy check --file <FILE_RULESET>
+$ pfDeploy check --file <FILE_RULESET>
 ```
 
 ## Exemplary configuration files

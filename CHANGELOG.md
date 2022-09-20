@@ -1,3 +1,6 @@
+# v0.2.3
+* Improve installation and usage documentation.
+
 # v0.2.2
 * Add more information to main package description.
 * Add INSTALLATION guide to README.

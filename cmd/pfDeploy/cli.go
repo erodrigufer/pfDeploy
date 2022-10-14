@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/erodrigufer/pfDeploy/internal/version"
 	"github.com/urfave/cli/v2"
 )
 
@@ -19,9 +20,19 @@ func (app *application) runTUI() {
 // setupCLI, configure and initialize all commands, flags and options of
 // the TUI.
 func (app *application) setupCLI() {
+	cli.VersionFlag = &cli.BoolFlag{
+		Name:    "revision",
+		Aliases: []string{"r"},
+		Usage:   "Print the VCS revision when the binary was built (if the binary is a modified version of a commit the suffix 'dirty' will be added to the revision hash).",
+	}
+	cli.VersionPrinter = func(cCtx *cli.Context) {
+		fmt.Printf("revision=%s\n", version.GetRevision())
+	}
+
 	app.tui = &cli.App{
-		Name:  "pfDeploy",
-		Usage: "Automatically setup pf in your new deployment.",
+		Name:    "pfDeploy",
+		Version: version.GetRevision(),
+		Usage:   "Automatically setup pf in your new deployment.",
 		// This options enables short flag abbreviations to be merged into a
 		// single flag with a '-' prefix.
 		UseShortOptionHandling: true,

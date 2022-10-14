@@ -1,3 +1,7 @@
+# v0.3.0
+* Add the `--revision`/`-r` flags to show the hash of the commit used to build the executable.
+	* If the executable was built with files with uncommitted changes the '-dirty' suffix will be added to the revision.
+
 # v0.2.3
 * Improve installation and usage documentation.
 

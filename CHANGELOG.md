@@ -1,3 +1,8 @@
+# v0.3.1
+* [BUG] Fix go version configuration in GitHub Action for GoReleaser.
+	* The Go version being used was too old, so it did not support the features required to get the revision from an executable.
+* Use Go v1.19 in go.mod file.
+
 # v0.3.0
 * Add the `--revision`/`-r` flags to show the hash of the commit used to build the executable.
 	* If the executable was built with files with uncommitted changes the '-dirty' suffix will be added to the revision.

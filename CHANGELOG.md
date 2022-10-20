@@ -1,3 +1,6 @@
+# v0.3.2
+* Merge PR with dependancies update (`urfave/cli`).
+
 # v0.3.1
 * [BUG] Fix go version configuration in GitHub Action for GoReleaser.
 	* The Go version being used was too old, so it did not support the features required to get the revision from an executable.

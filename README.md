@@ -1,4 +1,6 @@
 # pfDeploy
+[![PkgGoDev](https://pkg.go.dev/mod/github.com/erodrigufer/pfDeploy/cmd/pfDeploy)](https://pkg.go.dev/github.com/erodrigufer/pfDeploy/cmd/pfDeploy)
+
 `pfDeploy` is a command-line tool capable of automatically configuring pf and pflog in a FreeBSD host machine. It is especially useful to quickly configure a newly spawned FreeBSD VM.
 
 ## Table of contents
